@@ -1,1 +1,3 @@
 This is our first commit.
+
+print("Hello, this is INST326 group project.")
