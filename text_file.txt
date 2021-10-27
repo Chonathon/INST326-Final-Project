@@ -1,2 +1,2 @@
 This is our first commit.
-This is our second comit.
+This is our second commit.
