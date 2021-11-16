@@ -1,4 +1,0 @@
-This is our first commit.
-This is our second commit.
-
-print("Hello, this is INST326 group project.")
