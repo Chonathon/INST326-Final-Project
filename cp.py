@@ -437,6 +437,8 @@ class Inst:
         
 
 if __name__ == '__main__':
+    applicant = input("What is your name?")
+    print("Welcome", applicant, "to the InfoSci Course Planner.")
     course_plan = dict()
     cp_inst = Inst(path="202008.json")
     course_plan['Semester 1'] = cp_inst.semester_one(from_bm_stats=intro(questions=cp_questions))
