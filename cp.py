@@ -3,17 +3,22 @@ import pandas as pd
 import re
 from typing import Dict, List, Union
 
+
 question_type = Dict[str, str]
 course_plan_type = Dict[str, List[str]]
 
 
 def intro(questions: question_type) -> course_plan_type:
-    """A series of questions that will be presented to the user to determine if 
-    they have completed Benchmark courses.
+    """Asking a series of questions to determine whether the benchmark I & II 
+    requirements are met; otherwise, they’ll be needed for the first semester.
 
     Args:
-        questions (dict_str): Calling questions from a dict.
-    """
+        questions (question_type): A
+
+    Returns:
+        course_plan_type: [description]
+    """    
+
     course_plan = {'Benchmarks_Met': list(), 'Benchmarks_Unmet': list()}
     print("Please answer all questions using \"yes\" or \"no\".")
     for q_key, q_val in questions.items():
@@ -39,10 +44,10 @@ class Inst:
             df = pd.read_json(path)
             info = df[["course_id", "dept_id", "name", "credits", "relationships"]]
             math115 = info[info["course_id"] == "MATH115"]
-            psych100 = info[info["course_id"] == "PSYCH100"]
+            psyc100 = info[info["course_id"] == "PSYC100"]
             stat100 = info[info["course_id"] == "STAT100"]
             inst_courses = info[info["dept_id"] == "INST"]
-            inst_prgm = pd.concat([math115, psych100, stat100, inst_courses])
+            inst_prgm = pd.concat([math115, psyc100, stat100, inst_courses])
             
             # creating core attribute and identifying core classes as True
             core = False
@@ -64,7 +69,7 @@ class Inst:
             inst_prgm["benchmark_I"] = benchmark_I
 
             inst_prgm.loc[inst_prgm['course_id'] == 'MATH115', ['benchmark_I']] = True
-            inst_prgm.loc[inst_prgm['course_id'] == 'PSYCH100', ['benchmark_I']] = True
+            inst_prgm.loc[inst_prgm['course_id'] == 'PSYC100', ['benchmark_I']] = True
             
             benchmark_II = False
             inst_prgm["benchmark_II"] = benchmark_II
@@ -90,6 +95,18 @@ class Inst:
         (?P<course>[A-Z]+\d+)
         """
         return re.findall(regex, str(find))
+    
+    def credits(self, course):
+        """Finds the number of credits in the given course.
+
+        Args:
+            course (str ): An INST program course code.
+
+        Returns:
+            int: Course credits as an integer.
+        """
+        find = self.inst_prgm.loc[self.inst_prgm["course_id"] == course]["credits"].values[0]
+        return find
     
     def core(self, course):
         """Identifies whether a class is a 'core' class to the INST program.
@@ -132,19 +149,18 @@ class Inst:
         find = self.inst_prgm.loc[self.inst_prgm["course_id"] == course]["benchmark_II"].values[0]
         return find
 
-    #def credits(self, course):
-        """Finds the number of credits in the given course.
 
-        Args:
-            course (str ): An INST program course code.
-
-        Returns:
-            int: Course credits as an integer.
-        """
-        find = self.inst_prgm.loc[self.inst_prgm["course_id"] == course]["credits"].values[0]
-        return find
 
     def semester_one(self, from_course_plan: course_plan_type, num_courses: int = 5) -> course_plan_type:
+        """[summary]
+
+        Args:
+            from_course_plan (course_plan_type): [description]
+            num_courses (int, 5): [description]. Defaults to 5.
+
+        Returns:
+            course_plan_type: A data o
+        """        
         pd.set_option("display.max_columns", 6)
         pd.set_option("display.expand_frame_repr", False)
         pd.set_option("display.max_colwidth", None)
@@ -293,6 +309,7 @@ class Inst:
         return from_course_plan
 
     def semester_three(self, from_course_plan: course_plan_type, num_courses: int = 5) -> course_plan_type:
+    
         pd.set_option("display.max_columns", 6)
         pd.set_option("display.expand_frame_repr", False)
         pd.set_option("display.max_colwidth", None)
@@ -441,22 +458,22 @@ class Inst:
                                                 if c not in from_course_plan['Benchmarks_Met']]
         return from_course_plan
 
-    def graduate(self, from_course_plan: course_plan_type, num_courses: int = 5) -> None:
+    #def graduate(self, from_course_plan: course_plan_type, num_courses: int = 5) -> None:
         course_plan_courses = [val for val in from_course_plan.values()]
         course_plan_courses = list(set([cpc for sublist in course_plan_courses for cpc in sublist]))
         # TODO: Evaluate whether the credits are at least 60; and, if they are, say you've graduated. Otherwise...?
 
 
 if __name__ == '__main__':
-    applicant = ("What is your name? ")
+    applicant = ("What is your name?")
     print("Welcome", applicant, "to the Information Science Course planner.")
     cp_questions = {f'Have you taken {cid}?': cid for cid in ["MATH115", "PSYC100", "STAT100", "INST126", "INST201"]}
     course_plan = intro(questions=cp_questions)
-    course_plan = {'Benchmarks_Met': ['MATH115', 'STAT100', 'INST201'], 'Benchmarks_Unmet': ['PSYC100', 'INST126']}
+    #course_plan = {'Benchmarks_Met': ['MATH115', 'STAT100', 'INST201'], 'Benchmarks_Unmet': ['PSYC100', 'INST126']}
     cp_inst = Inst(path="202008.json")
     # Add courses for the semesters.
     course_plan = cp_inst.semester_one(from_course_plan=course_plan)
     course_plan = cp_inst.semester_two(from_course_plan=course_plan)
     course_plan = cp_inst.semester_three(from_course_plan=course_plan)
     course_plan = cp_inst.semester_four(from_course_plan=course_plan)
-    cp_inst.graduate(from_course_plan=course_plan)  # TODO: Make this method work.
+    #cp_inst.graduate(from_course_plan=course_plan)  # TODO: Make this method work.
