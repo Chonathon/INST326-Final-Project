@@ -3,6 +3,7 @@ import pandas as pd
 import re
 from typing import Dict, List, Union
 
+
 question_type = Dict[str, str]
 course_plan_type = Dict[str, List[str]]
 
@@ -163,8 +164,7 @@ class Inst:
         last possible semester, they will be forcibly added to the course plan.
         
         Args:
-            from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks, 
-            as well as semester course loads from previous semesters.
+            from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks.
             num_courses (int, optional): the number of courses you can take in a semester. Defaults to 5.
         
         Returns:
@@ -506,6 +506,16 @@ class Inst:
         return from_course_plan
 
     def graduate(self, from_course_plan: course_plan_type, num_courses: int = 5) -> None:
+        """To calculate if the 60 credits requirements have been met to graduate, 
+        otherwise, they will receive a message that they are not on track to graduate on time.
+        This mean they are required to start from the begining and complete course planner again
+        to meet the 60 credits requirements.
+
+        Args:
+            from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks, 
+            as well as ALL semester course loads from ALL four previous semesters.
+            num_courses (int, optional): the number of courses you can take in a semester. Defaults to 5.
+        """        
         course_plan_courses = [val for val in from_course_plan.values()]
         course_plan_courses = list(set([cpc for sublist in course_plan_courses for cpc in sublist]))
         completed_courses = self.inst_prgm[self.inst_prgm["course_id"].isin(course_plan_courses)]
