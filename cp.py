@@ -152,7 +152,8 @@ class Inst:
 
 
     def semester_one(self, from_course_plan: course_plan_type, num_courses: int = 5) -> course_plan_type:
-        """[summary]
+        """
+        Outlines the classes to be taken by the user in the first semester
 
         Args:
             from_course_plan (course_plan_type): [description]
