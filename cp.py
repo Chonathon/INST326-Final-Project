@@ -420,7 +420,7 @@ class Inst:
             else:  # A valid choice (course_id) was selected.
                 choice_prereqs = [c for c in self.prereq(course=choice) if c not in done_list]
                 if choice_prereqs == list():
-                    sem_list += [choice]
+                    sem_list += [choice]`
                     continue
                 n = 0
                 while n < len(choice_prereqs):
