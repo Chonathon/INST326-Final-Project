@@ -155,7 +155,7 @@ class Inst:
 
     def semester_one(self, from_course_plan: course_plan_type, num_courses: int = 5) -> course_plan_type:
         """
-        Thel be allowed to choose courses for which he is potentially eligible. If that course entails
+        students be allowed to choose courses for which he is potentially eligible. If that course entails
         prerequisites, they will be shown, and the student will have the opportunity to add them to his 
         course plan. If he meets all of the prerequisites, then the course will be added.
         
@@ -243,7 +243,7 @@ class Inst:
 
     def semester_two(self, from_course_plan: course_plan_type, num_courses: int = 5) -> course_plan_type:
         """
-        Thel be allowed to choose courses for which he is potentially eligible. If that course entails
+        students be allowed to choose courses for which he is potentially eligible. If that course entails
         prerequisites, they will be shown, and the student will have the opportunity to add them to his 
         course plan. If he meets all of the prerequisites, then the course will be added. 
         
@@ -334,7 +334,7 @@ class Inst:
 
     def semester_three(self, from_course_plan: course_plan_type, num_courses: int = 5) -> course_plan_type:
         """
-        Thel be allowed to choose courses for which he is potentially eligible. If that course entails
+        students be allowed to choose courses for which he is potentially eligible. If that course entails
         prerequisites, they will be shown, and the student will have the opportunity to add them to his 
         course plan. If he meets all of the prerequisites, then the course will be added. 
         
@@ -421,7 +421,7 @@ class Inst:
 
     def semester_four(self, from_course_plan: course_plan_type, num_courses: int = 5) -> course_plan_type:
         """
-        Thel be allowed to choose courses for which he is potentially eligible. If that course entails
+        students be allowed to choose courses for which he is potentially eligible. If that course entails
         prerequisites, they will be shown, and the student will have the opportunity to add them to his 
         course plan. If he meets all of the prerequisites, then the course will be added. 
         
