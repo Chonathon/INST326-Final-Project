@@ -3,6 +3,7 @@ import pandas as pd
 import re
 from typing import Dict, List, Union
 
+
 question_type = Dict[str, str]
 course_plan_type = Dict[str, List[str]]
 
@@ -155,7 +156,7 @@ class Inst:
 
     def semester_one(self, from_course_plan: course_plan_type, num_courses: int = 5) -> course_plan_type:
         """
-        Thel be allowed to choose courses for which he is potentially eligible. If that course entails
+        students be allowed to choose courses for which he is potentially eligible. If that course entails
         prerequisites, they will be shown, and the student will have the opportunity to add them to his 
         course plan. If he meets all of the prerequisites, then the course will be added.
         
@@ -163,9 +164,9 @@ class Inst:
         last possible semester, they will be forcibly added to the course plan.
         
         Args:
-            from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks, 
-            as well as semester course loads from previous semesters.
-            num_courses (int, optional): the number of courses you can take in a semester. Defaults to 5.
+            from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks.
+            num_courses (int, 5): the number of courses you can take in a semester. Defaults to 5, 
+            meaning 5 courses required to be taken in each semester.
         
         Returns:
             course_plan_type: sem_list , a list containing all selescted courses for the given semester.        
@@ -243,7 +244,7 @@ class Inst:
 
     def semester_two(self, from_course_plan: course_plan_type, num_courses: int = 5) -> course_plan_type:
         """
-        Thel be allowed to choose courses for which he is potentially eligible. If that course entails
+        students be allowed to choose courses for which he is potentially eligible. If that course entails
         prerequisites, they will be shown, and the student will have the opportunity to add them to his 
         course plan. If he meets all of the prerequisites, then the course will be added. 
         
@@ -253,7 +254,9 @@ class Inst:
         Args:
             from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks, 
             as well as semester course loads from previous semesters.
-            num_courses (int, optional): the number of courses you can take in a semester. Defaults to 5.
+            num_courses (int, 5): the number of courses you can take in a semester. Defaults to 5,
+            meaning 5 courses required to be taken in each semester.
+            
         Returns:
             course_plan_type: sem_list , a list containing all selescted courses for the given semester.
         """       
@@ -334,14 +337,15 @@ class Inst:
 
     def semester_three(self, from_course_plan: course_plan_type, num_courses: int = 5) -> course_plan_type:
         """
-        Thel be allowed to choose courses for which he is potentially eligible. If that course entails
+        students be allowed to choose courses for which he is potentially eligible. If that course entails
         prerequisites, they will be shown, and the student will have the opportunity to add them to his 
         course plan. If he meets all of the prerequisites, then the course will be added. 
         
         Args:
             from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks, 
             as well as semester course loads from previous semesters.
-            num_courses (int, optional): the number of courses you can take in a semester. Defaults to 5.
+            num_courses (int, 5): the number of courses you can take in a semester. Defaults to 5,
+            meaning 5 courses required to be taken in each semester.
         Returns:
             course_plan_type: sem_list , a list containing all selescted courses for the given semester.
         """ 
@@ -421,14 +425,15 @@ class Inst:
 
     def semester_four(self, from_course_plan: course_plan_type, num_courses: int = 5) -> course_plan_type:
         """
-        Thel be allowed to choose courses for which he is potentially eligible. If that course entails
+        students be allowed to choose courses for which he is potentially eligible. If that course entails
         prerequisites, they will be shown, and the student will have the opportunity to add them to his 
         course plan. If he meets all of the prerequisites, then the course will be added. 
         
         Args:
             from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks, 
             as well as semester course loads from previous semesters.
-            num_courses (int, optional): the number of courses you can take in a semester. Defaults to 5.
+            num_courses (int, 5): the number of courses you can take in a semester. Defaults to 5,
+            meaning 5 courses required to be taken in each semester.
         Returns:
             course_plan_type: sem_list , a list containing all selescted courses for the given semester.
         """ 
@@ -506,6 +511,17 @@ class Inst:
         return from_course_plan
 
     def graduate(self, from_course_plan: course_plan_type, num_courses: int = 5) -> None:
+        """To calculate if the 60 credits requirements have been met to graduate, 
+        otherwise, they will receive a message that they are not on track to graduate on time.
+        This mean they are required to start from the begining and complete course planner again
+        to meet the 60 credits requirements.
+
+        Args:
+            from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks, 
+            as well as ALL semester course loads from ALL four previous semesters.
+            num_courses (int, 5): the number of courses you can take in a semester. Defaults to 5,
+            meaning 5 courses required to be added in each semester.
+        """        
         course_plan_courses = [val for val in from_course_plan.values()]
         course_plan_courses = list(set([cpc for sublist in course_plan_courses for cpc in sublist]))
         completed_courses = self.inst_prgm[self.inst_prgm["course_id"].isin(course_plan_courses)]
