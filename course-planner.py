@@ -165,7 +165,8 @@ class Inst:
         
         Args:
             from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks.
-            num_courses (int, optional): the number of courses you can take in a semester. Defaults to 5.
+            num_courses (int, 5): the number of courses you can take in a semester. Defaults to 5, 
+            meaning 5 courses required to be taken in each semester.
         
         Returns:
             course_plan_type: sem_list , a list containing all selescted courses for the given semester.        
@@ -253,7 +254,9 @@ class Inst:
         Args:
             from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks, 
             as well as semester course loads from previous semesters.
-            num_courses (int, optional): the number of courses you can take in a semester. Defaults to 5.
+            num_courses (int, 5): the number of courses you can take in a semester. Defaults to 5,
+            meaning 5 courses required to be taken in each semester.
+            
         Returns:
             course_plan_type: sem_list , a list containing all selescted courses for the given semester.
         """       
@@ -341,7 +344,8 @@ class Inst:
         Args:
             from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks, 
             as well as semester course loads from previous semesters.
-            num_courses (int, optional): the number of courses you can take in a semester. Defaults to 5.
+            num_courses (int, 5): the number of courses you can take in a semester. Defaults to 5,
+            meaning 5 courses required to be taken in each semester.
         Returns:
             course_plan_type: sem_list , a list containing all selescted courses for the given semester.
         """ 
@@ -428,7 +432,8 @@ class Inst:
         Args:
             from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks, 
             as well as semester course loads from previous semesters.
-            num_courses (int, optional): the number of courses you can take in a semester. Defaults to 5.
+            num_courses (int, 5): the number of courses you can take in a semester. Defaults to 5,
+            meaning 5 courses required to be taken in each semester.
         Returns:
             course_plan_type: sem_list , a list containing all selescted courses for the given semester.
         """ 
@@ -514,7 +519,8 @@ class Inst:
         Args:
             from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks, 
             as well as ALL semester course loads from ALL four previous semesters.
-            num_courses (int, optional): the number of courses you can take in a semester. Defaults to 5.
+            num_courses (int, 5): the number of courses you can take in a semester. Defaults to 5,
+            meaning 5 courses required to be added in each semester.
         """        
         course_plan_courses = [val for val in from_course_plan.values()]
         course_plan_courses = list(set([cpc for sublist in course_plan_courses for cpc in sublist]))
