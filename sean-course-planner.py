@@ -3,6 +3,7 @@ import pandas as pd
 import re
 from typing import Dict, List, Union
 
+
 question_type = Dict[str, str]
 course_plan_type = Dict[str, List[str]]
 
@@ -34,15 +35,29 @@ class Inst:
     In addition to the available attributes, this class creates 
     columns to identify courses as being core, benchmark I, or benchmark II.
     """
+    class Inst:
+        """Creates a dataframe out of data gathered from 
+    https://github.com/umdio/umdio-data. In addition to the available 
+    attributes, this class creates columns to identify courses as being core,
+    benchmark I, or benchmark II.
+    
+    Attibutes:
+        inst_prgm: 
+    """
     def __init__(self, path):
          with open(path, 'r', encoding='utf-8') as df:
             df = pd.read_json(path)
             info = df[["course_id", "dept_id", "name", "credits", "relationships"]]
             math115 = info[info["course_id"] == "MATH115"]
-            psych100 = info[info["course_id"] == "PSYCH100"]
+            psyc100 = info[info["course_id"] == "PSYC100"]
             stat100 = info[info["course_id"] == "STAT100"]
             inst_courses = info[info["dept_id"] == "INST"]
-            inst_prgm = pd.concat([math115, psych100, stat100, inst_courses])
+            inst_courses = inst_courses[inst_courses["course_id"] != "INST301"]
+            #filtering Grad courses
+            inst_courses = inst_courses[inst_courses.course_id.str[4].astype(int) < 5]
+            
+            #combining rows into new dataframe
+            inst_prgm = pd.concat([math115, psyc100, stat100, inst_courses])
             
             # creating core attribute and identifying core classes as True
             core = False
@@ -65,6 +80,7 @@ class Inst:
 
             inst_prgm.loc[inst_prgm['course_id'] == 'MATH115', ['benchmark_I']] = True
             inst_prgm.loc[inst_prgm['course_id'] == 'PSYCH100', ['benchmark_I']] = True
+
             
             benchmark_II = False
             inst_prgm["benchmark_II"] = benchmark_II
@@ -73,9 +89,11 @@ class Inst:
             inst_prgm.loc[inst_prgm['course_id'] == 'INST126', ['benchmark_II']] = True
             inst_prgm.loc[inst_prgm['course_id'] == 'INST201', ['benchmark_II']] = True
             
-            self.inst_prgm = inst_prgm
+
+            
+            self.inst_prgm = inst_prgm 
              
-    def prereq(self, course) -> List[str]:
+    def prereq(self, course):
         """Identifies the prerequisite classes for the given course in the INST 
         program
 
@@ -85,11 +103,30 @@ class Inst:
         Returns:
             list: Items are course id's for the prerequisite classes
         """
-        find = ([d.get("prereqs") for d in self.inst_prgm[self.inst_prgm["course_id"] == course].relationships])
+        find = ([d.get("prereqs") for d in self.inst_prgm[self.inst_prgm
+                                        ["course_id"] == course].relationships])
         regex = r"""(?xm)
         (?P<course>[A-Z]+\d+)
         """
-        return re.findall(regex, str(find))
+        if course == "STAT100" or "MATH115":
+            return []
+        else:
+            allprereqslist = re.findall(regex,str(find))
+            onlyinstprereqs = ([i for i in allprereqslist if i[0] == "I" or i == "MATH115" or i == "PSYC100" or i == "STAT100"])
+            return onlyinstprereqs
+    
+    def credits(self, course):
+        """Finds the number of credits in the given course.
+
+        Args:
+            course (str ): An INST program course code.
+
+        Returns:
+            int: Course credits as an integer.
+        """
+        find = self.inst_prgm.loc[self.inst_prgm["course_id"] == course]["credits"].values[0]
+        return find
+    
     
     def core(self, course):
         """Identifies whether a class is a 'core' class to the INST program.
@@ -104,7 +141,8 @@ class Inst:
         find = self.inst_prgm.loc[self.inst_prgm["course_id"] == course]["core"].values[0]
         return find
     
-    def benchmark_I(self, course) -> bool:
+    
+    def benchmark_I(self, course):
         """Identifies whether a class is a 'benchmark_I' class to the INST 
         program.
 
@@ -118,7 +156,7 @@ class Inst:
         find = self.inst_prgm.loc[self.inst_prgm["course_id"] == course]["benchmark_I"].values[0]
         return find
   
-    def benchmark_II(self, course) -> bool:
+    def benchmark_II(self, course):
         """Identifies whether a class is a 'benchmark_II' class to the INST 
         program.
 
@@ -132,19 +170,23 @@ class Inst:
         find = self.inst_prgm.loc[self.inst_prgm["course_id"] == course]["benchmark_II"].values[0]
         return find
 
-    #def credits(self, course):
-        """Finds the number of credits in the given course.
-
-        Args:
-            course (str ): An INST program course code.
-
-        Returns:
-            int: Course credits as an integer.
-        """
-        find = self.inst_prgm.loc[self.inst_prgm["course_id"] == course]["credits"].values[0]
-        return find
-
     def semester_one(self, from_course_plan: course_plan_type, num_courses: int = 5) -> course_plan_type:
+        """
+        students be allowed to choose courses for which he is potentially eligible. If that course entails
+        prerequisites, they will be shown, and the student will have the opportunity to add them to his 
+        course plan. If he meets all of the prerequisites, then the course will be added.
+        
+        (In other semesters), if certain benchmark courses haven't been completed by the time of the
+        last possible semester, they will be forcibly added to the course plan.
+        
+        Args:
+            from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks.
+            num_courses (int, 5): the number of courses you can take in a semester. Defaults to 5, 
+            meaning 5 courses required to be taken in each semester.
+        
+        Returns:
+            course_plan_type: sem_list , a list containing all selescted courses for the given semester.        
+        """
         pd.set_option("display.max_columns", 6)
         pd.set_option("display.expand_frame_repr", False)
         pd.set_option("display.max_colwidth", None)
@@ -183,7 +225,7 @@ class Inst:
                 n = 0
                 while n < len(choice_prereqs):
                     cpq = choice_prereqs[n]
-                    cpq_prereqs = [c for c in self.prereq(course=cpq) if c not in done_list]
+                    cpq_prereqs = [c for c in self.prereq(course=cpq) if c not in done_list + choice_prereqs]
                     if cpq_prereqs == list():  # This prerequisite has no other prerequisites.
                         n += 1
                     else:
@@ -217,6 +259,23 @@ class Inst:
         return from_course_plan
 
     def semester_two(self, from_course_plan: course_plan_type, num_courses: int = 5) -> course_plan_type:
+        """
+        students be allowed to choose courses for which he is potentially eligible. If that course entails
+        prerequisites, they will be shown, and the student will have the opportunity to add them to his 
+        course plan. If he meets all of the prerequisites, then the course will be added. 
+        
+        (In Semester 2), if certain benchmark courses haven't been completed by the time of the
+        last possible semester, they will be forcibly added to the course plan.
+        
+        Args:
+            from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks, 
+            as well as semester course loads from previous semesters.
+            num_courses (int, 5): the number of courses you can take in a semester. Defaults to 5,
+            meaning 5 courses required to be taken in each semester.
+            
+        Returns:
+            course_plan_type: sem_list , a list containing all selescted courses for the given semester.
+        """       
         pd.set_option("display.max_columns", 6)
         pd.set_option("display.expand_frame_repr", False)
         pd.set_option("display.max_colwidth", None)
@@ -258,7 +317,7 @@ class Inst:
                 n = 0
                 while n < len(choice_prereqs):
                     cpq = choice_prereqs[n]
-                    cpq_prereqs = [c for c in self.prereq(course=cpq) if c not in done_list]
+                    cpq_prereqs = [c for c in self.prereq(course=cpq) if c not in done_list + choice_prereqs]
                     if cpq_prereqs == list():  # This prerequisite has no other prerequisites.
                         n += 1
                     else:
@@ -293,6 +352,19 @@ class Inst:
         return from_course_plan
 
     def semester_three(self, from_course_plan: course_plan_type, num_courses: int = 5) -> course_plan_type:
+        """
+        students be allowed to choose courses for which he is potentially eligible. If that course entails
+        prerequisites, they will be shown, and the student will have the opportunity to add them to his 
+        course plan. If he meets all of the prerequisites, then the course will be added. 
+        
+        Args:
+            from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks, 
+            as well as semester course loads from previous semesters.
+            num_courses (int, 5): the number of courses you can take in a semester. Defaults to 5,
+            meaning 5 courses required to be taken in each semester.
+        Returns:
+            course_plan_type: sem_list , a list containing all selescted courses for the given semester.
+        """ 
         pd.set_option("display.max_columns", 6)
         pd.set_option("display.expand_frame_repr", False)
         pd.set_option("display.max_colwidth", None)
@@ -333,7 +405,7 @@ class Inst:
                 n = 0
                 while n < len(choice_prereqs):
                     cpq = choice_prereqs[n]
-                    cpq_prereqs = [c for c in self.prereq(course=cpq) if c not in done_list]
+                    cpq_prereqs = [c for c in self.prereq(course=cpq) if c not in done_list + choice_prereqs]
                     if cpq_prereqs == list():  # This prerequisite has no other prerequisites.
                         n += 1
                     else:
@@ -368,12 +440,25 @@ class Inst:
         return from_course_plan
 
     def semester_four(self, from_course_plan: course_plan_type, num_courses: int = 5) -> course_plan_type:
+        """
+        students be allowed to choose courses for which he is potentially eligible. If that course entails
+        prerequisites, they will be shown, and the student will have the opportunity to add them to his 
+        course plan. If he meets all of the prerequisites, then the course will be added. 
+        
+        Args:
+            from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks, 
+            as well as semester course loads from previous semesters.
+            num_courses (int, 5): the number of courses you can take in a semester. Defaults to 5,
+            meaning 5 courses required to be taken in each semester.
+        Returns:
+            course_plan_type: sem_list , a list containing all selescted courses for the given semester.
+        """ 
         pd.set_option("display.max_columns", 6)
         pd.set_option("display.expand_frame_repr", False)
         pd.set_option("display.max_colwidth", None)
         pd.set_option("display.max_rows", None)
         done_list = [val for key, val in from_course_plan.items()
-                     if key in ("Benchmarks_Met", "Semester_1", "Semester_2")]
+                     if key in ("Benchmarks_Met", "Semester_1", "Semester_2", "Semester_3")]
         done_list = [dli for sublist in done_list for dli in sublist]  # This flattens the list.
         todo_list = [val for key, val in from_course_plan.items() if key in ("Benchmarks_Unmet")]
         todo_list = [tli for sublist in todo_list for tli in sublist]  # This flattens the list.
@@ -407,7 +492,7 @@ class Inst:
                 n = 0
                 while n < len(choice_prereqs):
                     cpq = choice_prereqs[n]
-                    cpq_prereqs = [c for c in self.prereq(course=cpq) if c not in done_list]
+                    cpq_prereqs = [c for c in self.prereq(course=cpq) if c not in done_list + choice_prereqs]
                     if cpq_prereqs == list():  # This prerequisite has no other prerequisites.
                         n += 1
                     else:
@@ -442,21 +527,38 @@ class Inst:
         return from_course_plan
 
     def graduate(self, from_course_plan: course_plan_type, num_courses: int = 5) -> None:
+        """To calculate if the 60 credits requirements have been met to graduate, 
+        otherwise, they will receive a message that they are not on track to graduate on time.
+        This mean they are required to start from the begining and complete course planner again
+        to meet the 60 credits requirements.
+
+        Args:
+            from_course_plan (course_plan_type): a dictionary of met and unmet benchmarks, 
+            as well as ALL semester course loads from ALL four previous semesters.
+            num_courses (int, 5): the number of courses you can take in a semester. Defaults to 5,
+            meaning 5 courses required to be added in each semester.
+        """        
         course_plan_courses = [val for val in from_course_plan.values()]
         course_plan_courses = list(set([cpc for sublist in course_plan_courses for cpc in sublist]))
-        # TODO: Evaluate whether the credits are at least 60; and, if they are, say you've graduated. Otherwise...?
+        completed_courses = self.inst_prgm[self.inst_prgm["course_id"].isin(course_plan_courses)]
+        credit_sum = completed_courses['credits'].sum()
+        if credit_sum >= 60:
+            print("You're on track to graduate:")
+            print(f"\tSemester 1: {', '.join(from_course_plan['Semester_1'])}")
+            print(f"\tSemester 2: {', '.join(from_course_plan['Semester_2'])}")
+            print(f"\tSemester 3: {', '.join(from_course_plan['Semester_3'])}")
+            print(f"\tSemester 4: {', '.join(from_course_plan['Semester_4'])}")
+        else:
+            print("You're not on track to graduate:")
 
 
 if __name__ == '__main__':
-    applicant = ("What is your name?")
-    print("Welcome", applicant, "to the Information Science Course planner.")
     cp_questions = {f'Have you taken {cid}?': cid for cid in ["MATH115", "PSYC100", "STAT100", "INST126", "INST201"]}
     course_plan = intro(questions=cp_questions)
-    course_plan = {'Benchmarks_Met': ['MATH115', 'STAT100', 'INST201'], 'Benchmarks_Unmet': ['PSYC100', 'INST126']}
     cp_inst = Inst(path="202008.json")
     # Add courses for the semesters.
     course_plan = cp_inst.semester_one(from_course_plan=course_plan)
     course_plan = cp_inst.semester_two(from_course_plan=course_plan)
     course_plan = cp_inst.semester_three(from_course_plan=course_plan)
     course_plan = cp_inst.semester_four(from_course_plan=course_plan)
-    cp_inst.graduate(from_course_plan=course_plan)  # TODO: Make this method work.
+    cp_inst.graduate(from_course_plan=course_plan)
