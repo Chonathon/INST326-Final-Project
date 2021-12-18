@@ -35,6 +35,16 @@ class Inst:
     In addition to the available attributes, this class creates 
     columns to identify courses as being core, benchmark I, or benchmark II.
     """
+    class Inst:
+        """Creates a dataframe out of data gathered from 
+    https://github.com/umdio/umdio-data. In addition to the available 
+    attributes, this class creates columns to identify courses as being core,
+    benchmark I, or benchmark II.
+    
+    Attibutes:
+        inst_prgm: Dataframe containing information on INST courses that will be used
+        for course planner to create list containing courses for each semesters.
+    """
     def __init__(self, path):
          with open(path, 'r', encoding='utf-8') as df:
             df = pd.read_json(path)
@@ -43,6 +53,11 @@ class Inst:
             psyc100 = info[info["course_id"] == "PSYC100"]
             stat100 = info[info["course_id"] == "STAT100"]
             inst_courses = info[info["dept_id"] == "INST"]
+            inst_courses = inst_courses[inst_courses["course_id"] != "INST301"]
+            #filtering Grad courses
+            inst_courses = inst_courses[inst_courses.course_id.str[4].astype(int) < 5]
+            
+            #combining rows into new dataframe
             inst_prgm = pd.concat([math115, psyc100, stat100, inst_courses])
             
             # creating core attribute and identifying core classes as True
@@ -94,10 +109,12 @@ class Inst:
         regex = r"""(?xm)
         (?P<course>[A-Z]+\d+)
         """
-        allprereqslist = re.findall(regex,str(find))
-        onlyinstprereqs = [i for i in allprereqslist if i[0] == "I"  or i == "PSYC100"] 
-         
-        return onlyinstprereqs
+        if course == "STAT100" or "MATH115":
+            return []
+        else:
+            allprereqslist = re.findall(regex,str(find))
+            onlyinstprereqs = ([i for i in allprereqslist if i[0] == "I" or i == "MATH115" or i == "PSYC100" or i == "STAT100"])
+            return onlyinstprereqs
     
     def credits(self, course):
         """Finds the number of credits in the given course.
