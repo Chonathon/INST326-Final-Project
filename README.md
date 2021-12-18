@@ -15,7 +15,7 @@ To properly use our program, you will need two files:
 course-planner.py
 202008.json
 ```
-Then you can simply run the program through the command line by calling course-planner.py which will start the program.
+Then you can simply run the program through the command line by calling course-planner.py which will start the program. Answer the questionnaire and follow through with courses for the upcoming semesters to properly plan your school year.
 Keywords that you may encounter during the use of this programs:
 ```txt
 p:  It will print out all available from the dataframe.
