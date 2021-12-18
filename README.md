@@ -51,3 +51,8 @@ Class INST
 def semester_four
 def graduate
 ```
+
+## Bibliography
+ - [Readme Editor](https://readme.so/editor)
+    Helped us properly format a Readme document
+ - 
