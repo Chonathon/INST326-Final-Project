@@ -55,4 +55,5 @@ def graduate
 ## Bibliography
  - [Readme Editor](https://readme.so/editor)
     Helped us properly format a Readme document
- - 
+ - [UMDio Data](https://github.com/umdio/umdio-data)
+    Source of the classes and prerequisites offered by UMD
