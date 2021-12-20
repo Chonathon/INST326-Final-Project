@@ -55,4 +55,4 @@ def graduate
 ## Bibliography
  - [Readme Editor](https://readme.so/editor)
     Helped us properly format a Readme document
- - 
+ - [Real Python] (https://realpython.com/python-dicts/) Provided insight in to how to work with dictionaries that are within a dataframe.
