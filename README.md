@@ -57,4 +57,4 @@ def graduate
     Helped us properly format a Readme document
  - [UMDio Data](https://github.com/umdio/umdio-data)
     Source of the classes and prerequisites offered by UMD
- - [Real Python] (https://realpython.com/python-dicts/) Provided insight in to how to work with dictionaries that are within a dataframe.
+ - [Real Python](https://realpython.com/python-dicts/) Provided insight in to how to work with dictionaries that are within a dataframe.
